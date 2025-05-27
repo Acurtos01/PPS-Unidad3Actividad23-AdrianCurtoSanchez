@@ -151,3 +151,48 @@ Y podemos descargar el resultado del analisis de semgrep.
 
 ## Crear reglas personalizadas
 
+Creamos el archivo `files/custom-rules.yaml` en nuestro repositorio **semgrep-prueba**:
+
+```
+rules:
+  - id: eval-personalizada
+    pattern: eval(...)
+    message: "Uso de eval() detectado. Eval puede ser peligroso si se usa con entrada no controlada."
+    severity: WARNING
+    languages:
+      - python
+
+```
+
+## Ejecutar análisis con las reglas personalizadas.
+
+Volvemos a repetir los pasos iniciales de crear el entorno virtual y la instalación semgrep sobre el repositorio **semgrep-prueba** para la realiación de este paso.
+
+Vamos a realizar el análisis estático sobre nuestro repositorio **semgrep-prueba** con el siguiente comando:
+
+```
+semgrep --config=files/custom-rules.yaml .
+```
+
+![alt text](images/semgrep-custom-rules.png)
+
+## Integración de reglas personalizadas con Github CI/CD
+
+Modificamos la línea del archivo `.github/workflows/semgrep.yml`
+```
+  run: semgrep --config=auto --json --output=semgrep-results.json
+```
+
+por la línea
+
+```
+  run: semgrep --config=files/custom-rules.yaml  --json --output=semgrep-results.json
+```
+
+Al realizar un `push` en el repositorio con los cambios se ejecuta automáticamente la acción creada.
+
+![alt text](images/custom-rule-action.png)
+
+Si accedemos a los detalles y descargamos el archivo `semgrep-report` con el resultado en formato JSON, podemos ver el resultado de la ejecución:
+
+![alt text](images/semgrep-results2.png)
